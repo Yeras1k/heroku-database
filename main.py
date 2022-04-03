@@ -18,9 +18,11 @@ def zhdat(user_id, stickers):
     db_object.execute(f"UPDATE users SET stickers = stickers + {int(stickers)} WHERE id = {user_id}")
     db_connection.commit()
 
+
 def nezhdat(user_id, stickers):
     db_object.execute(f"UPDATE users SET stickers = stickers - {int(stickers)} WHERE id = {user_id}")
     db_connection.commit()
+
 
 @bot.message_handler(commands=["show"])
 def show(message):
@@ -30,6 +32,7 @@ def show(message):
     result = db_object.fetchone()
 
     bot.reply_to(message, f"{username}:  {result}")
+
 
 @bot.message_handler(commands=["start"])
 def start(message):
@@ -44,12 +47,6 @@ def start(message):
         db_object.execute("INSERT INTO users(id, username, stickers) VALUES (%s, %s, %s)", (user_id, username, 0))
         db_connection.commit()
 
-@server.route(f"/{BOT_TOKEN}", methods=["POST"])
-def redirect_message():
-    json_string = request.get_data().decode("utf-8")
-    update = telebot.types.Update.de_json(json_string)
-    bot.process_new_updates([update])
-    return "!", 200
 
 @bot.message_handler(content_types=['text'])
 def get_text_messages(message):
@@ -61,15 +58,22 @@ def get_text_messages(message):
         user_id = message.from_user.id
         stic = message.text[8:]
         nezhdat(user_id=user_id, stickers=stic)
-    if 'показать всех' in message.text.lower():
+    if message.text.lower() == 'all':
         user_id = message.from_user.id
         if user_id == '956153880' or user_id == '581490657':
             db_object.execute("SELECT name, stickers FROM users")
             result = db_object.fetchall()
             for row in result:
-                bot.reply_to(message.message, f"{row}")
+                bot.sent_message(message.chat.id, f"{row}")
         if user_id != '956153880' and user_id != '581490657':
-            bot.reply_to(message, "У вас нет особых прав")
+            bot.sent_message(message.chat_id, "У вас нет особых прав")
+
+@server.route(f"/{BOT_TOKEN}", methods=["POST"])
+def redirect_message():
+    json_string = request.get_data().decode("utf-8")
+    update = telebot.types.Update.de_json(json_string)
+    bot.process_new_updates([update])
+    return "!", 200
 
 if __name__ == "__main__":
     bot.remove_webhook()
