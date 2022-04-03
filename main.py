@@ -13,6 +13,10 @@ logger.setLevel(logging.DEBUG)
 db_connection = psycopg2.connect(DB_URI, sslmode="require")
 db_object = db_connection.cursor()
 
+@bot.message_handler(func=lambda message: True, content_types=["text"])
+def zhdat(user_id, message):
+    db_object.execute(f"UPDATE users SET stickers = stickers + {int(message.text)} WHERE id = {user_id}")
+    db_connection.commit()
 
 @bot.message_handler(commands=["show"])
 def show(message):
@@ -21,15 +25,13 @@ def show(message):
     db_object.execute(f"SELECT stickers FROM users WHERE id = {user_id}")
     result = db_object.fetchone()
 
-    bot.reply_to(message, f"{username}: {result}")
+    bot.reply_to(message, f"{username}:  {result}")
 
 @bot.message_handler(commands=["add"])
 def add_stick(message):
+    user_id = message.from_user.id
     bot.send_message(message, 'Введите сколько нужно добавить стикеров')
-    @bot.message_handler(func=lambda message: True, content_types=["text"])
-    def message_from_user(message):
-        user_id = message.from_user.id
-        db_object.execute(f"UPDATE users SET stickers = stickers + {int(message.text)} WHERE id = {user_id}")
+    zhdat(user_id, message.text)
 
 @bot.message_handler(commands=["start"])
 def start(message):
