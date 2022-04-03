@@ -59,12 +59,12 @@ def get_text_messages(message):
         stic = message.text[8:]
         nezhdat(user_id=user_id, stickers=stic)
     if message.text.lower() == 'all':
-        bot.sent_message(message.chat.id, 'ВОТ')
+        bot.send_message(message.chat.id, 'ВОТ')
         db_object.execute("SELECT name, stickers FROM users")
         result = db_object.fetchall()
         for i in range(result):
             for d in range(result(i)):
-                bot.sent_message(message.chat.id, f"{d}")
+                bot.send_message(message.chat.id, f"{d}")
 
 @server.route(f"/{BOT_TOKEN}", methods=["POST"])
 def redirect_message():
