@@ -13,9 +13,6 @@ logger.setLevel(logging.DEBUG)
 db_connection = psycopg2.connect(DB_URI, sslmode="require")
 db_object = db_connection.cursor()
 
-def update_messages_count(username):
-    db_object.execute(f"UPDATE users SET password = 'qwerty' WHERE name = {username}")
-    db_connection.commit()
 
 @bot.message_handler(commands=["start"])
 def start(message):
@@ -29,7 +26,6 @@ def start(message):
         db_object.execute("INSERT INTO users(name, password) VALUES (%s, %s)", (username, 'qwerty'))
         db_connection.commit()
 
-    update_messages_count(username)
 
 @server.route(f"/{BOT_TOKEN}", methods=["POST"])
 def redirect_message():
