@@ -13,8 +13,8 @@ logger.setLevel(logging.DEBUG)
 db_connection = psycopg2.connect(DB_URI, sslmode="require")
 db_object = db_connection.cursor()
 
-def zhdat(user_id, message):
-    db_object.execute(f"UPDATE users SET stickers = stickers + {int(message)} WHERE id = {user_id}")
+def zhdat(user_id, stickers):
+    db_object.execute(f"UPDATE users SET stickers = stickers + {int(stickers)} WHERE id = {user_id}")
     db_connection.commit()
 
 @bot.message_handler(commands=["show"])
@@ -26,14 +26,6 @@ def show(message):
 
     bot.reply_to(message, f"{username}:  {result}")
 
-@bot.message_handler(commands=["add"])
-def add_stick(message):
-    user_id = message.from_user.id
-    @bot.message_handler(content_types=['text'])
-    def get_text_messages(message):
-        ms = message.text
-        bot.send_message(message, 'Введите сколько нужно добавить стикеров')
-        zhdat(user_id, ms)
 
 @bot.message_handler(commands=["start"])
 def start(message):
@@ -55,6 +47,12 @@ def redirect_message():
     bot.process_new_updates([update])
     return "!", 200
 
+@bot.message_handler(content_types=['text'])
+def get_text_messages(message):
+    if "добавить" in message.text.lower():
+        user_id = message.from_user.id
+        stic = message.text[7:]
+        zhdat(user_id=user_id, stickers=stic)
 
 if __name__ == "__main__":
     bot.remove_webhook()
