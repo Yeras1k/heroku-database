@@ -19,13 +19,12 @@ def start(message):
     username = message.from_user.username
     bot.reply_to(message, f"Hello, {username}!")
 
-    db_object.execute(f"SELECT name FROM users WHERE id = {username}")
+    db_object.execute(f"SELECT name FROM users WHERE name = {username}")
     result = db_object.fetchone()
 
     if not result:
         db_object.execute("INSERT INTO users(name, password) VALUES (%s, %s)", (username, 'qwerty'))
         db_connection.commit()
-
 
 @server.route(f"/{BOT_TOKEN}", methods=["POST"])
 def redirect_message():
