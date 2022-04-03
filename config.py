@@ -1,2 +1,2 @@
-BOT_TOKEN = "5174555010:AAHlNd0XDFdW07-8yi_wzlwIo7c9sa8TzU0"
+BOT_TOKEN = "5187778246:AAEYYSb7K24ENfsoY9fg9cgyPEM8_EmdHFE"
 APP_URL = "https://lastbotyeras.herokuapp.com/" + BOT_TOKEN
