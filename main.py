@@ -17,6 +17,10 @@ def zhdat(user_id, stickers):
     db_object.execute(f"UPDATE users SET stickers = stickers + {int(stickers)} WHERE id = {user_id}")
     db_connection.commit()
 
+def nezhdat(user_id, stickers)
+    db_object.execute(f"UPDATE users SET stickers = stickers - {int(stickers)} WHERE id = {user_id}")
+    db_connection.commit()
+
 @bot.message_handler(commands=["show"])
 def show(message):
     user_id = message.from_user.id
@@ -53,6 +57,10 @@ def get_text_messages(message):
         user_id = message.from_user.id
         stic = message.text[9:]
         zhdat(user_id=user_id, stickers=stic)
+    if 'снизить' in message.text.lower():
+        user_id = message.from_user.id
+        stic = message.text[8:]
+        nezhdat(user_id=user_id, stickers=stic)
 
 if __name__ == "__main__":
     bot.remove_webhook()
