@@ -16,6 +16,7 @@ db_object = db_connection.cursor()
 
 @bot.message_handler(commands=["start"])
 def start(message):
+    pas = 'qwerty'
     username = message.from_user.username
     bot.reply_to(message, f"Hello, {username}!")
 
@@ -23,7 +24,7 @@ def start(message):
     result = db_object.fetchone()
 
     if not result:
-        db_object.execute("INSERT INTO users(name, password) VALUES (%s, %s)", (username, 'qwerty'))
+        db_object.execute("INSERT INTO users(name, password) VALUES (%s, %s)", (username, pas))
         db_connection.commit()
 
 @server.route(f"/{BOT_TOKEN}", methods=["POST"])
