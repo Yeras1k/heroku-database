@@ -62,7 +62,7 @@ def get_text_messages(message):
         bot.send_message(message.chat.id, 'ВОТ')
         db_object.execute("SELECT username, stickers FROM users")
         result = db_object.fetchall()
-        for i in range(len(result)):
+        for i in result:
             bot.send_message(message.chat.id, f"{i}")
 
 @server.route(f"/{BOT_TOKEN}", methods=["POST"])
