@@ -19,6 +19,15 @@ def update_messages_count(user_id):
     db_connection.commit()
 
 
+@bot.message_handler(commands=["show"])
+def start(message):
+    user_id = message.from_user.id
+    username = message.from_user.username
+    db_object.execute(f"SELECT stickers FROM users WHERE id = {user_id}")
+    result = db_object.fetchone()
+
+    bot.reply_to(message, f"{username} {result}!")
+
 @bot.message_handler(commands=["start"])
 def start(message):
     user_id = message.from_user.id
