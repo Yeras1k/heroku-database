@@ -16,8 +16,9 @@ db_object = db_connection.cursor()
 def vse():
     db_object.execute("SELECT name, stickers FROM users")
     result = db_object.fetchall()
-    text = '\n\n'.join([', '.join(map(str, x)) for x in result])
-    bot.send_message(str(text))
+    for row in result:
+        for line in row:
+            bot.send_message(str(line))
 
 def zhdat(user_id, stickers):
     db_object.execute(f"UPDATE users SET stickers = stickers + {int(stickers)} WHERE id = {user_id}")
