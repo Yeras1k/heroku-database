@@ -38,7 +38,6 @@ def start(message):
     bot.reply_to(message, f"Hello, {username}!")
 
     db_object.execute(f"SELECT id FROM users WHERE id = {user_id}")
-    db_object.execute(f"SELECT name FROM users WHERE name = {username}")
     result = db_object.fetchone()
 
     if not result:
@@ -63,14 +62,13 @@ def get_text_messages(message):
         stic = message.text[8:]
         nezhdat(user_id=user_id, stickers=stic)
     if 'показать всех' in message.text.lower():
-        username = message.from_user.username
-        if username == 'yeras1k' or username == 'b4kyt':
+        user_id = message.from_user.id
+        if user_id == '956153880' or user_id == '581490657':
             db_object.execute("SELECT name, stickers FROM users")
             result = db_object.fetchall()
             for row in result:
-                for line in row:
-                    bot.send_message(message.chat.id, f"{line}")
-        if username != 'yeras1k' and username != 'b4kyt':
+                bot.send_message(message.chat.id, f"{row}")
+        if user_id != '956153880' and user_id != '581490657':
             bot.reply_to(message, "У вас нет особых прав")
 
 if __name__ == "__main__":
