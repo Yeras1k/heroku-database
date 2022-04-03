@@ -14,19 +14,20 @@ db_connection = psycopg2.connect(DB_URI, sslmode="require")
 db_object = db_connection.cursor()
 
 
-def update_messages_count(user_id):
-    db_object.execute(f"UPDATE users SET stickers = stickers + 1 WHERE id = {user_id}")
-    db_connection.commit()
-
-
 @bot.message_handler(commands=["show"])
-def start(message):
+def show(message):
     user_id = message.from_user.id
     username = message.from_user.username
     db_object.execute(f"SELECT stickers FROM users WHERE id = {user_id}")
     result = db_object.fetchone()
 
-    bot.reply_to(message, f"{username} {result}!")
+    bot.reply_to(message, f"{username}: {result}")
+
+@bot.message_handler(commands=["add"])
+def add_stick(message):
+    user_id = message.from_user.id
+    bot.send_message(message, 'Введите сколько нужно добавить стикеров')
+    db_object.execute(f"UPDATE users SET stickers = stickers + {int(message.text)} WHERE id = {user_id}")
 
 @bot.message_handler(commands=["start"])
 def start(message):
@@ -40,8 +41,6 @@ def start(message):
     if not result:
         db_object.execute("INSERT INTO users(id, username, stickers) VALUES (%s, %s, %s)", (user_id, username, 0))
         db_connection.commit()
-
-    update_messages_count(user_id)
 
 @server.route(f"/{BOT_TOKEN}", methods=["POST"])
 def redirect_message():
