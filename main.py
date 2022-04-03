@@ -63,7 +63,7 @@ def get_text_messages(message):
         db_object.execute("SELECT username, stickers FROM users")
         result = db_object.fetchall()
         for i in result:
-            bot.send_message(message.chat.id, f"{i}")
+            bot.send_message(message.chat.id, f"{i[0], i[1]}")
 
 @server.route(f"/{BOT_TOKEN}", methods=["POST"])
 def redirect_message():
