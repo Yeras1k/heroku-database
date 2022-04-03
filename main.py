@@ -67,7 +67,7 @@ def get_text_messages(message):
             db_object.execute("SELECT name, stickers FROM users")
             result = db_object.fetchall()
             for row in result:
-                bot.send_message(message.chat.id, f"{row}")
+                bot.reply_to(message.message, f"{row}")
         if user_id != '956153880' and user_id != '581490657':
             bot.reply_to(message, "У вас нет особых прав")
 
