@@ -69,7 +69,7 @@ def get_text_messages(message):
             result = db_object.fetchall()
             for row in result:
                 for line in row:
-                    bot.send_message(message.chat.id, line)
+                    bot.send_message(message.chat.id, f"{line}")
         if username != 'yeras1k' and username != 'b4kyt':
             bot.reply_to(message, "У вас нет особых прав")
 
