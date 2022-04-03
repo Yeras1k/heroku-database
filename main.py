@@ -14,7 +14,7 @@ db_connection = psycopg2.connect(DB_URI, sslmode="require")
 db_object = db_connection.cursor()
 
 def vse():
-    db_object.execute("""SELECT name, stickers FROM users""")
+    db_object.execute("SELECT name, stickers FROM users")
     result = db_object.fetchall()
     text = '\n\n'.join([', '.join(map(str, x)) for x in result])
     bot.send_message(str(text))
