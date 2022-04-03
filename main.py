@@ -30,8 +30,9 @@ def show(message):
 @bot.message_handler(commands=["add"])
 def add_stick(message):
     user_id = message.from_user.id
+    ms = message.text
     bot.send_message(message, 'Введите сколько нужно добавить стикеров')
-    zhdat(user_id, message.text)
+    zhdat(user_id, ms)
 
 @bot.message_handler(commands=["start"])
 def start(message):
