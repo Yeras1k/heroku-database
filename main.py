@@ -51,7 +51,7 @@ def redirect_message():
 def get_text_messages(message):
     if "добавить" in message.text.lower():
         user_id = message.from_user.id
-        stic = message.text[7:]
+        stic = message.text[9:]
         zhdat(user_id=user_id, stickers=stic)
 
 if __name__ == "__main__":
