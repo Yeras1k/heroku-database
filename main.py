@@ -66,7 +66,8 @@ def get_text_messages(message):
         stic = message.text[8:]
         nezhdat(user_id=user_id, stickers=stic)
     if 'показать всех' in message.text.lower():
-        if message.from_user.id == 581490657 or message.from_user.id == 956153880:
+        user_id = message.from_user.id
+        if user_id == '581490657' or user_id == '956153880':
             vse()
         else:
             bot.reply_to(message, "У вас нет особых прав")
