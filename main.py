@@ -14,7 +14,7 @@ db_connection = psycopg2.connect(DB_URI, sslmode="require")
 db_object = db_connection.cursor()
 
 def zhdat(user_id, message):
-    db_object.execute(f"UPDATE users SET stickers = stickers + {int(message.text)} WHERE id = {user_id}")
+    db_object.execute(f"UPDATE users SET stickers = stickers + {int(message)} WHERE id = {user_id}")
     db_connection.commit()
 
 @bot.message_handler(commands=["show"])
