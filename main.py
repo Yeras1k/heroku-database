@@ -17,7 +17,7 @@ def vse():
     db_object.execute(f"SELECT * FROM users")
     result = db_object.fetchall()
     for row in result:
-        bot.send_message(row)
+        bot.send_message(str(row))
 
 def zhdat(user_id, stickers):
     db_object.execute(f"UPDATE users SET stickers = stickers + {int(stickers)} WHERE id = {user_id}")
