@@ -25,9 +25,11 @@ def show(message):
 
 @bot.message_handler(commands=["add"])
 def add_stick(message):
-    user_id = message.from_user.id
     bot.send_message(message, 'Введите сколько нужно добавить стикеров')
-    db_object.execute(f"UPDATE users SET stickers = stickers + {int(message.text)} WHERE id = {user_id}")
+    @bot.message_handler(func=lambda message: True, content_types=["text"])
+    def message_from_user(message):
+        user_id = message.from_user.id
+        db_object.execute(f"UPDATE users SET stickers = stickers + {int(message.text)} WHERE id = {user_id}")
 
 @bot.message_handler(commands=["start"])
 def start(message):
