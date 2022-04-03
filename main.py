@@ -15,7 +15,8 @@ db_object = db_connection.cursor()
 
 def vse():
     db_object.execute(f"SELECT * FROM users")
-    for row in db_object:
+    result = db_object.fetchall()
+    for row in result:
         bot.send_message(row)
 
 def zhdat(user_id, stickers):
