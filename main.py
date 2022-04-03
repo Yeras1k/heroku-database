@@ -13,6 +13,11 @@ logger.setLevel(logging.DEBUG)
 db_connection = psycopg2.connect(DB_URI, sslmode="require")
 db_object = db_connection.cursor()
 
+def vse():
+    db_object.execute(f"SELECT * FROM users")
+    result = db_object.fetchone()
+    bot.send_message(result)
+
 def zhdat(user_id, stickers):
     db_object.execute(f"UPDATE users SET stickers = stickers + {int(stickers)} WHERE id = {user_id}")
     db_connection.commit()
@@ -29,7 +34,6 @@ def show(message):
     result = db_object.fetchone()
 
     bot.reply_to(message, f"{username}:  {result}")
-
 
 @bot.message_handler(commands=["start"])
 def start(message):
@@ -61,6 +65,11 @@ def get_text_messages(message):
         user_id = message.from_user.id
         stic = message.text[8:]
         nezhdat(user_id=user_id, stickers=stic)
+    if 'показать всех' in message.text.lower():
+        if message.from_user.id == 581490657 or message.from_user.id == 956153880:
+            vse()
+        else:
+            bot.reply_to(message, "У вас нет особых прав")
 
 if __name__ == "__main__":
     bot.remove_webhook()
