@@ -13,12 +13,6 @@ logger.setLevel(logging.DEBUG)
 db_connection = psycopg2.connect(DB_URI, sslmode="require")
 db_object = db_connection.cursor()
 
-def vse():
-    db_object.execute("SELECT name, stickers FROM users")
-    result = db_object.fetchall()
-    for row in result:
-        for line in row:
-            bot.send_message(str(line))
 
 def zhdat(user_id, stickers):
     db_object.execute(f"UPDATE users SET stickers = stickers + {int(stickers)} WHERE id = {user_id}")
@@ -70,7 +64,11 @@ def get_text_messages(message):
     if 'показать всех' in message.text.lower():
         username = message.from_user.username
         if username == 'yeras1k' or username == 'b4kyt':
-            vse()
+            db_object.execute("SELECT name, stickers FROM users")
+            result = db_object.fetchall()
+            for row in result:
+                for line in row:
+                    bot.send_message(message, str(line))
         if username != 'yeras1k' and username != 'b4kyt':
             bot.reply_to(message, "У вас нет особых прав")
 
