@@ -17,7 +17,7 @@ def zhdat(user_id, stickers):
     db_object.execute(f"UPDATE users SET stickers = stickers + {int(stickers)} WHERE id = {user_id}")
     db_connection.commit()
 
-def nezhdat(user_id, stickers)
+def nezhdat(user_id, stickers):
     db_object.execute(f"UPDATE users SET stickers = stickers - {int(stickers)} WHERE id = {user_id}")
     db_connection.commit()
 
