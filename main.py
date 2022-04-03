@@ -38,6 +38,7 @@ def start(message):
     bot.reply_to(message, f"Hello, {username}!")
 
     db_object.execute(f"SELECT id FROM users WHERE id = {user_id}")
+    db_object.execute(f"SELECT name FROM users WHERE name = {username}")
     result = db_object.fetchone()
 
     if not result:
@@ -68,7 +69,7 @@ def get_text_messages(message):
             result = db_object.fetchall()
             for row in result:
                 for line in row:
-                    bot.send_message(message, str(line))
+                    bot.send_message(message.chat.id, line)
         if username != 'yeras1k' and username != 'b4kyt':
             bot.reply_to(message, "У вас нет особых прав")
 
