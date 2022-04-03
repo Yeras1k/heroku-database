@@ -14,18 +14,25 @@ db_connection = psycopg2.connect(DB_URI, sslmode="require")
 db_object = db_connection.cursor()
 
 
+def update_messages_count(user_id):
+    db_object.execute(f"UPDATE users SET stickers = stickers + 1 WHERE id = {user_id}")
+    db_connection.commit()
+
+
 @bot.message_handler(commands=["start"])
 def start(message):
-    pas = 'qwerty'
+    user_id = message.from_user.id
     username = message.from_user.username
     bot.reply_to(message, f"Hello, {username}!")
 
-    db_object.execute(f"SELECT name FROM users WHERE name = {username}")
+    db_object.execute(f"SELECT id FROM users WHERE id = {user_id}")
     result = db_object.fetchone()
 
     if not result:
-        db_object.execute("INSERT INTO users(name, password) VALUES (%s, %s)", (username, pas))
+        db_object.execute("INSERT INTO users(id, username, stickers) VALUES (%s, %s, %s)", (user_id, username, 0))
         db_connection.commit()
+
+    update_messages_count(user_id)
 
 @server.route(f"/{BOT_TOKEN}", methods=["POST"])
 def redirect_message():
