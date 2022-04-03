@@ -60,7 +60,7 @@ def get_text_messages(message):
         nezhdat(user_id=user_id, stickers=stic)
     if message.text.lower() == 'all':
         bot.send_message(message.chat.id, 'ВОТ')
-        db_object.execute("SELECT name, stickers FROM users")
+        db_object.execute("SELECT username, stickers FROM users")
         result = db_object.fetchall()
         for i in range(result):
             for d in range(result(i)):
