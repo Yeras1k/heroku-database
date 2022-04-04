@@ -1,5 +1,6 @@
 import os
 import telebot
+from aiogram import types
 import psycopg2
 import logging
 from config import *
@@ -25,7 +26,10 @@ def minusstic(usernick, stickers):
 
 
 @bot.message_handler(commands=["show"])
-def show(message):
+async def cmd_how(message: types.Message):
+    keyboard = types.ReplyKeyboardMarkup()
+    button_1 = types.KeyboardButton(text="Профиль")
+    keyboard.add(button_1)
     user_id = message.from_user.id
     username = message.from_user.username
     db_object.execute(f"SELECT stickers FROM users WHERE id = {user_id}")
@@ -34,17 +38,33 @@ def show(message):
     bot.reply_to(message, f"{username}:  {result}")
 
 
+@bot.message_handler(commands=["change"])
+async def cmd_how(message: types.Message):
+    keyboard = types.ReplyKeyboardMarkup()
+    button_2 = types.KeyboardButton(text="Сменить ник")
+    keyboard.add(button_2)
+    bot.send_message("Введите новый ник")
+
+    @bot.message_handler(content_types=['text'])
+    def get_text_messages2(message2):
+        user_id = message2.from_user.id
+        db_object.execute(f"UPDATE users SET nick = {message2.text} WHERE id = {user_id}")
+        db_connection.commit()
+        bot.send_message("Ник успешно сменен")
+
+
 @bot.message_handler(commands=["start"])
 def start(message):
     user_id = message.from_user.id
     username = message.from_user.username
+    usernick = message.from_user.first_name
     bot.reply_to(message, f"Hello, {username}!")
 
     db_object.execute(f"SELECT id FROM users WHERE id = {user_id}")
     result = db_object.fetchone()
 
     if not result:
-        db_object.execute("INSERT INTO users(id, username, stickers) VALUES (%s, %s, %s)", (user_id, username, 0))
+        db_object.execute("INSERT INTO users(id, username, stickers, nick) VALUES (%i, %s, %i, %s)", (user_id, username, 0, usernick))
         db_connection.commit()
 
 
@@ -52,6 +72,7 @@ def start(message):
 def get_text_messages(message):
     if message.text == '+':
         bot.send_message(message.chat.id, 'Введите имя ученика')
+
         @bot.message_handler(content_types=['text'])
         def get_text_messages5(message2):
             user_nick = message2.text
@@ -59,8 +80,9 @@ def get_text_messages(message):
             result1 = db_object.fetchone()
             if not result1:
                 bot.send_message(message2.chat.id, 'Такого ученика нет')
-            else:
+            if result1:
                 bot.send_message(message2.chat.id, 'Введите количество стикеров для добавления')
+
                 @bot.message_handler(content_types=['text'])
                 def get_text_messages4(message3):
                     addstic(usernick=user_nick, stickers=message3.text)
