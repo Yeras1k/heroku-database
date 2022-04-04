@@ -53,8 +53,8 @@ def get_text_messages(message):
     if message.text == '+':
         bot.send_message(message.chat.id, 'Введите имя ученика')
 
-        @bot.message_handlers(content_types=['text'])
-        def get_text_messages2(message2):
+        @bot.message_handler(content_types=['text'])
+        def get_text_messages5(message2):
             user_nick = message2.text
             db_object.execute(f"SELECT nick FROM users WHERE nick = {user_nick}")
             result1 = db_object.fetchone()
@@ -63,8 +63,8 @@ def get_text_messages(message):
             else:
                 bot.send_message(message2.chat.id, 'Введите количество стикеров для добавления')
 
-                @bot.message_handlers(content_types=['text'])
-                def get_text_messages3(message3):
+                @bot.message_handler(content_types=['text'])
+                def get_text_messages4(message3):
                     addstic(usernick=user_nick, stickers=message3.text)
 
     if message.text == '-':
@@ -80,7 +80,7 @@ def get_text_messages(message):
             else:
                 bot.send_message(message2.chat.id, 'Введите количество стикеров для уменьшения')
 
-                @bot.message_handlers(content_types=['text'])
+                @bot.message_handler(content_types=['text'])
                 def get_text_messages3(message3):
                     minusstic(usernick=user_nick, stickers=message3.text)
 
@@ -91,7 +91,7 @@ def get_text_messages(message):
             db_object.execute("SELECT username, stickers FROM users")
             result = db_object.fetchall()
             for i in result:
-                bot.send_message(message.chat.id, f"{i[0] + i[1]}")
+                bot.send_message(message.chat.id, f"{i[0] , i[1]}")
         else:
             bot.send_message(message.chat.id, 'У вас недостаточно прав')
 
