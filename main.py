@@ -83,7 +83,7 @@ def message_from_user(message):
         a = new.split()
         user_nick = a[0]
         stickers = a[1]
-        db_object.execute(f"SELECT nick FROM users WHERE nick = {user_nick}")
+        db_object.execute(f"SELECT nick FROM users WHERE nick = '{user_nick}'")
         result1 = db_object.fetchone()
         if not result1:
             bot.send_message(message.chat.id, 'Такого ученика нет, попробуйте снова')
