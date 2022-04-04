@@ -69,12 +69,6 @@ def get_stats(message):
         bot.reply_to(message, reply_message)
 
 
-@bot.message_handler(commands=["stics"])
-def get_adds(message):
-    add_session[message.from_user] = []
-    bot.send_message(message.chat.id, "Добавление стикеров(+) или отнятие стикеров(-). Введите: НИК Число")
-
-
 @bot.message_handler(content_types=["text"])
 def message_from_user(message):
     if 'изменить ник' in message.text:
@@ -86,8 +80,9 @@ def message_from_user(message):
 
     if 'править' in message.text:
         new = message.text[8:]
-        user_nick = new.split.strip()[0]
-        stickers = new.split.strip()[1]
+        a = new.split()
+        user_nick = a[0]
+        stickers = a[1]
         db_object.execute(f"SELECT nick FROM users WHERE nick = {user_nick}")
         result1 = db_object.fetchone()
         if not result1:
