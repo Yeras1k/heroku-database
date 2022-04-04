@@ -8,7 +8,6 @@ from config import *
 from flask import Flask, request
 
 add_session = {}
-minus_session = {}
 
 bot = telebot.TeleBot(BOT_TOKEN)
 server = Flask(__name__)
@@ -21,9 +20,8 @@ db_object = db_connection.cursor()
 @bot.message_handler(func = lambda message: message.from_user in add_session)
 def uchenik(message):
     current = add_session[message.from_user]
-    a = current.append(message.text)
-    user_nick = a.split[0]
-    stickers = a.split[1]
+    user_nick = current[0].strip().split()[0]
+    stickers = current[0].strip().split()[1]
     db_object.execute(f"SELECT nick FROM users WHERE nick = {user_nick}")
     result1 = db_object.fetchone()
     if not result1:
@@ -31,38 +29,19 @@ def uchenik(message):
     else:
         addstic(user_nick, stickers)
 
-@bot.message_handler(func = lambda message: message.from_user in minus_session)
-def uchenik1(message):
-    current = minus_session[message.from_user]
-    a = current.append(message.text)
-    user_nick = a.split[0]
-    stickers = a.split[1]
-    db_object.execute(f"SELECT nick FROM users WHERE nick = {user_nick}")
-    result1 = db_object.fetchone()
-    if not result1:
-        bot.send_message(message.chat.id, 'Такого ученика нет')
-    else:
-        minusstic(user_nick, stickers)
-
-
 def addstic(usernick, stickers):
     db_object.execute(f"UPDATE users SET stickers = stickers + {int(stickers)} WHERE nick = {usernick}")
     db_connection.commit()
 
 
-def minusstic(usernick, stickers):
-    db_object.execute(f"UPDATE users SET stickers = stickers - {int(stickers)} WHERE nick = {usernick}")
-    db_connection.commit()
-
 
 @bot.message_handler(commands=["start"])
 def start(message):
-    bot.send_message(message.chat.id, "Все команды: \
-                                       1. /stats - просмотр своего количества стикеров \
-                                       2. изменить ник ... - вместо ... пишите свой новый ник \
-                                       3. /statsall - просмотр всех учеников(только для учителя) \
-                                       4. /add - добавление стикеров(только для учителя) \
-                                       5. /minus - уменьшение количества стикеров(только для учителя)")
+    bot.send_message(message.chat.id, "Все команды: \n"
+                                       "1. /stats - просмотр своего количества стикеров \n"
+                                       "2. изменить ник ... - вместо ... пишите свой новый ник \n"
+                                       "3. /statsall - просмотр всех учеников(только для учителя) \n"
+                                       "4. /stics - изменение кол. тикеров ученика(+ и -)(только для учителя)")
     usernick = message.from_user.first_name
     user_id = message.from_user.id
     username = message.from_user.username
@@ -106,15 +85,10 @@ def get_stats(message):
         bot.reply_to(message, reply_message)
 
 
-@bot.message_handler(commands=["add"])
+@bot.message_handler(commands=["stics"])
 def get_adds(message):
     add_session[message.from_user] = []
-    bot.send_message(message.chat.id, "Введите: НИК Число")
-
-@bot.message_handler(commands=["minus"])
-def get_minus(message):
-    minus_session[message.from_user] = []
-    bot.send_message(message.chat.id, "Введите: НИК Число")
+    bot.send_message(message.chat.id, "Добавление стикеров(+) или отнятие стикеров(-). Введите: НИК Число")
 
 def smena(nick, id):
     user_id = id
