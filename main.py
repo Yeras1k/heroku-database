@@ -21,10 +21,9 @@ db_object = db_connection.cursor()
 @bot.message_handler(func = lambda message: message.from_user in add_session)
 def uchenik(message):
     current = add_session[message.from_user]
-    current.append(message.text)
-    da = current[0].split()
-    user_nick = da[0]
-    stickers = da[1]
+    a = current.append(message.text)
+    user_nick = a.split[0]
+    stickers = a.split[1]
     db_object.execute(f"SELECT nick FROM users WHERE nick = {user_nick}")
     result1 = db_object.fetchone()
     if not result1:
@@ -35,10 +34,9 @@ def uchenik(message):
 @bot.message_handler(func = lambda message: message.from_user in minus_session)
 def uchenik1(message):
     current = minus_session[message.from_user]
-    current.append(message.text)
-    da = current[0].split()
-    user_nick = da[0]
-    stickers = da[1]
+    a = current.append(message.text)
+    user_nick = a.split[0]
+    stickers = a.split[1]
     db_object.execute(f"SELECT nick FROM users WHERE nick = {user_nick}")
     result1 = db_object.fetchone()
     if not result1:
@@ -77,14 +75,16 @@ def start(message):
 def get_stats(message):
     db_object.execute("SELECT * FROM users ORDER BY stickers DESC LIMIT 20")
     result = db_object.fetchall()
-
-    if not result:
-        bot.reply_to(message, "No data...")
+    if message.from_user.id == 581490657 or message.from_user.id == 956153880:
+        if not result:
+            bot.reply_to(message, "No data...")
+        else:
+            reply_message = "- Top stickers farmers:\n"
+            for i, item in enumerate(result):
+                reply_message += f"[{i + 1}] {item[3].strip()} ({item[1]}) : {item[2]} stickers.\n"
+            bot.reply_to(message, reply_message)
     else:
-        reply_message = "- Top stickers farmers:\n"
-        for i, item in enumerate(result):
-            reply_message += f"[{i + 1}] {item[1].strip()} ({item[0]}) : {item[2]} stickers.\n"
-        bot.reply_to(message, reply_message)
+        bot.send_message(message.chat.id, "Недостаточно прав")
 
 @bot.message_handler(commands=["add"])
 def get_adds(message):
