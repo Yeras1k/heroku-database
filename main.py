@@ -1,10 +1,12 @@
 import os
 import telebot
-from aiogram import types
+from telebot import types
+from aiogram import *
 import psycopg2
 import logging
 from config import *
 from flask import Flask, request
+
 
 bot = telebot.TeleBot(BOT_TOKEN)
 server = Flask(__name__)
@@ -28,15 +30,17 @@ def minusstic(usernick, stickers):
 @bot.message_handler(commands=["start"])
 def start(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    btn1 = ["Профиль", "Сменить ник"]
-    buttons = ["Добавить стикеры", "Отнять стикеры"]
-    btn3 = types.KeyboardButton("Все данные")
-    markup.add(*btn1, *buttons, btn3)
-
+    btn1 = types.KeyboardButton("Профиль")
+    btn2 = types.KeyboardButton("Сменить ник")
+    btn3 = types.KeyboardButton("Добавить стикеры")
+    btn4 = types.KeyboardButton("Отнять стикеры")
+    btn5 = types.KeyboardButton("Все данные")
+    markup.add(btn1, btn2, btn3, btn4, btn5)
+    bot.reply_to(message, f"Hello, {message.from_user.first_name}!")
+    usernick = message.from_user.first_name
     user_id = message.from_user.id
     username = message.from_user.username
-    usernick = message.from_user.first_name
-    bot.reply_to(message, f"Hello, {username}!")
+
 
     db_object.execute(f"SELECT id FROM users WHERE id = {user_id}")
     result = db_object.fetchone()
@@ -99,12 +103,13 @@ def func(message):
                     minusstic(usernick=result1, stickers=bal)
 
     elif (message.text == "Главное меню"):
-        bot.send_message(message.chat.id, text="Вы вернулись в главное меню")
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         btn1 = types.KeyboardButton("Профиль")
-        buttons = ["Добавить стикеры", "Отнять стикеры"]
-        btn3 = types.KeyboardButton("Все данные")
-        markup.add(btn1, *buttons, btn3)
+        btn2 = types.KeyboardButton("Сменить ник")
+        btn3 = types.KeyboardButton("Добавить стикеры")
+        btn4 = types.KeyboardButton("Отнять стикеры")
+        btn5 = types.KeyboardButton("Все данные")
+        markup.add(btn1, btn2, btn3, btn4, btn5)
 
     elif (message.text == "Все данные"):
         user_id = message.from_user.id
@@ -122,8 +127,8 @@ def func(message):
 
         @bot.message_handler(content_types=['text'])
         def get_text_messages2(message2):
-            user_id = message2.from_user.id
-            db_object.execute(f"UPDATE users SET nick = {message2.text} WHERE id = {user_id}")
+            user_id2 = message2.from_user.id
+            db_object.execute(f"UPDATE users SET nick = {message2.text} WHERE id = {user_id2}")
             db_connection.commit()
             bot.send_message(message.chat.id, "Ник успешно сменен")
 
@@ -134,6 +139,7 @@ def redirect_message():
     update = telebot.types.Update.de_json(json_string)
     bot.process_new_updates([update])
     return "!", 200
+
 
 if __name__ == "__main__":
     bot.remove_webhook()
