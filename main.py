@@ -31,7 +31,7 @@ def show(message):
     db_object.execute(f"SELECT stickers FROM users WHERE id = {user_id}")
     result = db_object.fetchone()
 
-    bot.reply_to(message, f"{username}:  {result[:-1]}")
+    bot.reply_to(message, f"{username}:  {result}")
 
 
 @bot.message_handler(commands=["start"])
@@ -48,7 +48,7 @@ def start(message):
         db_connection.commit()
 
 
-@bot.message_handlers(content_types=['text'])
+@bot.message_handler(content_types=['text'])
 def get_text_messages(message):
     if message.text == '+':
         bot.send_message(message.chat.id, 'Введите имя ученика')
@@ -61,16 +61,16 @@ def get_text_messages(message):
             if not result1:
                 bot.send_message(message2.chat.id, 'Такого ученика нет')
             else:
-                bot.send_message(message2.chat.id, 'Введите количество стикров для добавления')
+                bot.send_message(message2.chat.id, 'Введите количество стикеров для добавления')
 
-                @bot.message_handler(content_types=['text'])
+                @bot.message_handlers(content_types=['text'])
                 def get_text_messages3(message3):
                     addstic(usernick=user_nick, stickers=message3.text)
 
     if message.text == '-':
         bot.send_message(message.chat.id, 'Введите имя ученика')
 
-        @bot.message_handlers(content_types=['text'])
+        @bot.message_handler(content_types=['text'])
         def get_text_messages2(message2):
             user_nick = message2.text
             db_object.execute(f"SELECT nick FROM users WHERE nick = {user_nick}")
@@ -78,9 +78,9 @@ def get_text_messages(message):
             if not result2:
                 bot.send_message(message2.chat.id, 'Такого ученика нет')
             else:
-                bot.send_message(message2.chat.id, 'Введите имя ученика')
+                bot.send_message(message2.chat.id, 'Введите количество стикеров для уменьшения')
 
-                @bot.message_handler(content_types=['text'])
+                @bot.message_handlers(content_types=['text'])
                 def get_text_messages3(message3):
                     minusstic(usernick=user_nick, stickers=message3.text)
 
