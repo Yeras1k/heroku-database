@@ -24,7 +24,7 @@ def start(message):
                                        "1. /stats - просмотр своего количества стикеров \n"
                                        "2. изменить ник ... - вместо ... пишите свой новый ник \n"
                                        "3. /statsall - просмотр всех учеников(только для учителя) \n"
-                                       "4. править ХХХ ... - изменение кол. стикеров ученика(+ и -)(только для учителя)")
+                                       "4. edit ХХХ ... - изменение кол. стикеров ученика(+ и -)(только для учителя)")
     usernick = message.from_user.first_name
     user_id = message.from_user.id
     username = message.from_user.username
@@ -78,8 +78,8 @@ def message_from_user(message):
         db_connection.commit()
         bot.send_message(message.chat.id, "Ник УСПЕШНО изменен")
 
-    if 'править' in message.text:
-        new = message.text[8:]
+    if 'edit' in message.text:
+        new = message.text[5:]
         a = new.split()
         user_nick = a[0]
         stickers = a[1]
