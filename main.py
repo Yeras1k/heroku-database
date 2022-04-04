@@ -52,7 +52,6 @@ def start(message):
 def get_text_messages(message):
     if message.text == '+':
         bot.send_message(message.chat.id, 'Введите имя ученика')
-
         @bot.message_handler(content_types=['text'])
         def get_text_messages5(message2):
             user_nick = message2.text
@@ -62,14 +61,12 @@ def get_text_messages(message):
                 bot.send_message(message2.chat.id, 'Такого ученика нет')
             else:
                 bot.send_message(message2.chat.id, 'Введите количество стикеров для добавления')
-
                 @bot.message_handler(content_types=['text'])
                 def get_text_messages4(message3):
                     addstic(usernick=user_nick, stickers=message3.text)
 
     if message.text == '-':
         bot.send_message(message.chat.id, 'Введите имя ученика')
-
         @bot.message_handler(content_types=['text'])
         def get_text_messages2(message2):
             user_nick = message2.text
@@ -79,7 +76,6 @@ def get_text_messages(message):
                 bot.send_message(message2.chat.id, 'Такого ученика нет')
             else:
                 bot.send_message(message2.chat.id, 'Введите количество стикеров для уменьшения')
-
                 @bot.message_handler(content_types=['text'])
                 def get_text_messages3(message3):
                     minusstic(usernick=user_nick, stickers=message3.text)
