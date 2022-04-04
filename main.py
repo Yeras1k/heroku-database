@@ -20,8 +20,10 @@ db_object = db_connection.cursor()
 @bot.message_handler(func = lambda message: message.from_user in add_session)
 def uchenik(message):
     current = add_session[message.from_user]
+    current.append(message.text)
     user_nick = current[0].strip().split()[0]
     stickers = current[0].strip().split()[1]
+
     db_object.execute(f"SELECT nick FROM users WHERE nick = {user_nick}")
     result1 = db_object.fetchone()
     if not result1:
@@ -30,8 +32,11 @@ def uchenik(message):
         addstic(user_nick, stickers)
 
 def addstic(usernick, stickers):
-    db_object.execute(f"UPDATE users SET stickers = stickers + {int(stickers)} WHERE nick = {usernick}")
+    db_object.execute(f"UPDATE users SET stickers = stickers + {int(stickers)} WHERE nick = '{usernick}'")
+    db_object.execute(f"SELECT stickers FROM users WHERE nick = '{usernick}'")
+    c = db_object.fetchone()
     db_connection.commit()
+    bot.send_message(usernick.chat.id, f"Количество стикеров для ({usernick}) изменены на [{stickers}] и составляют [{c[0]}]")
 
 
 
@@ -94,6 +99,7 @@ def smena(nick, id):
     user_id = id
     db_object.execute(f"UPDATE users SET nick = '{nick}' WHERE id = {user_id}")
     db_connection.commit()
+    bot.send_message(nick.chat.id, "Ник УСПЕШНО изменен")
 
 @bot.message_handler(content_types=["text"])
 def message_from_user(message):
