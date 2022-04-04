@@ -57,6 +57,12 @@ def minusstic(usernick, stickers):
 
 @bot.message_handler(commands=["start"])
 def start(message):
+    bot.send_message(message.chat.id, "Все команды: \
+                                       1. /stats - просмотр своего количества стикеров \
+                                       2. изменить ник ... - вместо ... пишите свой новый ник \
+                                       3. /statsall - просмотр всех учеников(только для учителя) \
+                                       4. /add - добавление стикеров(только для учителя) \
+                                       5. /minus - уменьшение количества стикеров(только для учителя)")
     usernick = message.from_user.first_name
     user_id = message.from_user.id
     username = message.from_user.username
@@ -66,12 +72,12 @@ def start(message):
     result = db_object.fetchone()
 
     if not result:
-        db_object.execute("INSERT INTO users(id, username, stickers, nick) VALUES (%s, %s, %i, %s)", \
+        db_object.execute("INSERT INTO users(id, username, stickers, nick) VALUES (%s, %s, %i, %s)",
                           (user_id, username, 0, usernick))
         db_connection.commit()
 
 
-@bot.message_handler(commands=["stats"])
+@bot.message_handler(commands=["statsall"])
 def get_stats(message):
     db_object.execute("SELECT * FROM users ORDER BY stickers DESC LIMIT 20")
     result = db_object.fetchall()
@@ -81,10 +87,24 @@ def get_stats(message):
         else:
             reply_message = "- Top stickers farmers:\n"
             for i, item in enumerate(result):
-                reply_message += f"[{i + 1}] {item[3].strip()} ({item[1]}) : {item[2]} stickers.\n"
+                reply_message += f"[{i + 1}] {item[3].strip()} ({item[1].strip()}) : {item[2]} stickers.\n"
             bot.reply_to(message, reply_message)
     else:
         bot.send_message(message.chat.id, "Недостаточно прав")
+
+@bot.message_handler(commands=["stats"])
+def get_stats(message):
+    user_id = message.from_user.id
+    db_object.execute(f"SELECT * FROM users WHERE id = {user_id}")
+    result = db_object.fetchall()
+    if not result:
+        bot.reply_to(message, "No data...")
+    else:
+        reply_message = "- Your stats:\n"
+        for i, item in enumerate(result):
+            reply_message += f"[{i + 1}] {item[3].strip()} ({item[1].strip()}) : {item[2]} stickers.\n"
+        bot.reply_to(message, reply_message)
+
 
 @bot.message_handler(commands=["add"])
 def get_adds(message):
@@ -98,7 +118,7 @@ def get_minus(message):
 
 def smena(nick, id):
     user_id = id
-    db_object.execute(f"UPDATE users SET nick = {nick} WHERE id = {user_id}")
+    db_object.execute(f"UPDATE users SET nick = '{nick}' WHERE id = {user_id}")
     db_connection.commit()
 
 @bot.message_handler(content_types=["text"])
