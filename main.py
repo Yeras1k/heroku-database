@@ -17,28 +17,6 @@ logger.setLevel(logging.DEBUG)
 db_connection = psycopg2.connect(DB_URI, sslmode="require")
 db_object = db_connection.cursor()
 
-@bot.message_handler(func = lambda message: message.from_user in add_session)
-def uchenik(message):
-    current = add_session[message.from_user]
-    current.append(message.text)
-    user_nick = current[0].strip().split()[0]
-    stickers = current[0].strip().split()[1]
-
-    db_object.execute(f"SELECT nick FROM users WHERE nick = {user_nick}")
-    result1 = db_object.fetchone()
-    if not result1:
-        bot.send_message(message.chat.id, 'Такого ученика нет')
-    else:
-        addstic(user_nick, stickers)
-
-def addstic(usernick, stickers):
-    db_object.execute(f"UPDATE users SET stickers = stickers + {int(stickers)} WHERE nick = '{usernick}'")
-    db_object.execute(f"SELECT stickers FROM users WHERE nick = '{usernick}'")
-    c = db_object.fetchone()
-    db_connection.commit()
-    bot.send_message(usernick.chat.id, f"Количество стикеров для ({usernick}) изменены на [{stickers}] и составляют [{c[0]}]")
-
-
 
 @bot.message_handler(commands=["start"])
 def start(message):
@@ -46,7 +24,7 @@ def start(message):
                                        "1. /stats - просмотр своего количества стикеров \n"
                                        "2. изменить ник ... - вместо ... пишите свой новый ник \n"
                                        "3. /statsall - просмотр всех учеников(только для учителя) \n"
-                                       "4. /stics - изменение кол. тикеров ученика(+ и -)(только для учителя)")
+                                       "4. править ХХХ ... - изменение кол. стикеров ученика(+ и -)(только для учителя)")
     usernick = message.from_user.first_name
     user_id = message.from_user.id
     username = message.from_user.username
@@ -76,6 +54,7 @@ def get_stats(message):
     else:
         bot.send_message(message.chat.id, "Недостаточно прав")
 
+
 @bot.message_handler(commands=["stats"])
 def get_stats(message):
     user_id = message.from_user.id
@@ -95,18 +74,31 @@ def get_adds(message):
     add_session[message.from_user] = []
     bot.send_message(message.chat.id, "Добавление стикеров(+) или отнятие стикеров(-). Введите: НИК Число")
 
-def smena(nick, id):
-    user_id = id
-    db_object.execute(f"UPDATE users SET nick = '{nick}' WHERE id = {user_id}")
-    db_connection.commit()
-    bot.send_message(nick.chat.id, "Ник УСПЕШНО изменен")
 
 @bot.message_handler(content_types=["text"])
 def message_from_user(message):
     if 'изменить ник' in message.text:
-        id = message.from_user.id
+        userid = message.from_user.id
         new = message.text[13:]
-        smena(new, id)
+        db_object.execute(f"UPDATE users SET nick = '{new}' WHERE id = {userid}")
+        db_connection.commit()
+        bot.send_message(message.chat.id, "Ник УСПЕШНО изменен")
+
+    if 'править' in message.text:
+        new = message.text[8:]
+        user_nick = new.split.strip()[0]
+        stickers = new.split.strip()[1]
+        db_object.execute(f"SELECT nick FROM users WHERE nick = {user_nick}")
+        result1 = db_object.fetchone()
+        if not result1:
+            bot.send_message(message.chat.id, 'Такого ученика нет, попробуйте снова')
+        else:
+            db_object.execute(f"UPDATE users SET stickers = stickers + {int(stickers)} WHERE nick = '{user_nick}'")
+            db_object.execute(f"SELECT stickers FROM users WHERE nick = '{user_nick}'")
+            c = db_object.fetchone()
+            db_connection.commit()
+            bot.send_message(message.chat.id,
+                             f"Количество стикеров для ({user_nick}) изменены на [{stickers}] и составляют [{c[0]}]")
 
 
 @server.route(f"/{BOT_TOKEN}", methods=["POST"])
