@@ -48,12 +48,12 @@ def start(message):
         db_connection.commit()
 
 
-@bot.message_handler(content_types=['text'])
+@bot.message_handlers(content_types=['text'])
 def get_text_messages(message):
     if message.text == '+':
         bot.send_message(message.chat.id, 'Введите имя ученика')
 
-        @bot.message_handler(content_types=['text'])
+        @bot.message_handlers(content_types=['text'])
         def get_text_messages2(message2):
             user_nick = message2.text
             db_object.execute(f"SELECT nick FROM users WHERE nick = {user_nick}")
@@ -61,7 +61,7 @@ def get_text_messages(message):
             if not result1:
                 bot.send_message(message2.chat.id, 'Такого ученика нет')
             else:
-                bot.send_message(message2.chat.id, 'Введите имя ученика')
+                bot.send_message(message2.chat.id, 'Введите количество стикров для добавления')
 
                 @bot.message_handler(content_types=['text'])
                 def get_text_messages3(message3):
@@ -70,7 +70,7 @@ def get_text_messages(message):
     if message.text == '-':
         bot.send_message(message.chat.id, 'Введите имя ученика')
 
-        @bot.message_handler(content_types=['text'])
+        @bot.message_handlers(content_types=['text'])
         def get_text_messages2(message2):
             user_nick = message2.text
             db_object.execute(f"SELECT nick FROM users WHERE nick = {user_nick}")
@@ -86,7 +86,7 @@ def get_text_messages(message):
 
     if message.text.lower() == 'all':
         user_id = message.from_user.id
-        if user_id == "956153880" or user_id == "581490657":
+        if user_id == 956153880 or user_id == 581490657:
             bot.send_message(message.chat.id, 'Список:')
             db_object.execute("SELECT username, stickers FROM users")
             result = db_object.fetchall()
