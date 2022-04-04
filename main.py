@@ -31,7 +31,7 @@ def start(message):
     btn1 = ["Профиль", "Сменить ник"]
     buttons = ["Добавить стикеры", "Отнять стикеры"]
     btn3 = types.KeyboardButton("Все данные")
-    markup.add(btn1, *buttons, btn3)
+    markup.add(*btn1, *buttons, btn3)
 
     user_id = message.from_user.id
     username = message.from_user.username
@@ -42,7 +42,7 @@ def start(message):
     result = db_object.fetchone()
 
     if not result:
-        db_object.execute("INSERT INTO users(id, username, stickers, nick) VALUES (%i, %s, %i, %s)",
+        db_object.execute("INSERT INTO users(id, username, stickers, nick) VALUES (%s, %s, %i, %s)",
                           (user_id, username, 0, usernick))
         db_connection.commit()
 
