@@ -7,6 +7,8 @@ import logging
 from config import *
 from flask import Flask, request
 
+add_session = {}
+minus_session = {}
 
 bot = telebot.TeleBot(BOT_TOKEN)
 server = Flask(__name__)
@@ -15,6 +17,34 @@ logger.setLevel(logging.DEBUG)
 
 db_connection = psycopg2.connect(DB_URI, sslmode="require")
 db_object = db_connection.cursor()
+
+@bot.message_handler(func = lambda message: message.from_user in add_session)
+def uchenik(message):
+    current = add_session[message.from_user]
+    current.append(message.text)
+    da = current[0].split()
+    user_nick = da[0]
+    stickers = da[1]
+    db_object.execute(f"SELECT nick FROM users WHERE nick = {user_nick}")
+    result1 = db_object.fetchone()
+    if not result1:
+        bot.send_message(message.chat.id, 'Такого ученика нет')
+    else:
+        addstic(user_nick, stickers)
+
+@bot.message_handler(func = lambda message: message.from_user in minus_session)
+def uchenik1(message):
+    current = minus_session[message.from_user]
+    current.append(message.text)
+    da = current[0].split()
+    user_nick = da[0]
+    stickers = da[1]
+    db_object.execute(f"SELECT nick FROM users WHERE nick = {user_nick}")
+    result1 = db_object.fetchone()
+    if not result1:
+        bot.send_message(message.chat.id, 'Такого ученика нет')
+    else:
+        minusstic(user_nick, stickers)
 
 
 def addstic(usernick, stickers):
@@ -29,108 +59,54 @@ def minusstic(usernick, stickers):
 
 @bot.message_handler(commands=["start"])
 def start(message):
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    btn1 = types.KeyboardButton("Профиль")
-    btn2 = types.KeyboardButton("Сменить ник")
-    btn3 = types.KeyboardButton("Добавить стикеры")
-    btn4 = types.KeyboardButton("Отнять стикеры")
-    btn5 = types.KeyboardButton("Все данные")
-    markup.add(btn1, btn2, btn3, btn4, btn5)
-    bot.reply_to(message, f"Hello, {message.from_user.first_name}!")
     usernick = message.from_user.first_name
     user_id = message.from_user.id
     username = message.from_user.username
-
+    bot.reply_to(message, f"Hello, {message.from_user.first_name}!")
 
     db_object.execute(f"SELECT id FROM users WHERE id = {user_id}")
     result = db_object.fetchone()
 
     if not result:
-        db_object.execute("INSERT INTO users(id, username, stickers, nick) VALUES (%s, %s, %i, %s)",
+        db_object.execute("INSERT INTO users(id, username, stickers, nick) VALUES (%s, %s, %i, %s)", \
                           (user_id, username, 0, usernick))
         db_connection.commit()
 
 
-@bot.message_handler(content_types=['text'])
-def func(message):
+@bot.message_handler(commands=["stats"])
+def get_stats(message):
+    db_object.execute("SELECT * FROM users ORDER BY stickers DESC LIMIT 20")
+    result = db_object.fetchall()
 
-    if (message.text == "Профиль"):
-        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        back = types.KeyboardButton("Главное меню")
-        markup.add(back)
-        user_id = message.from_user.id
-        username = message.from_user.username
-        db_object.execute(f"SELECT stickers FROM users WHERE id = {user_id}")
-        result = db_object.fetchone()
+    if not result:
+        bot.reply_to(message, "No data...")
+    else:
+        reply_message = "- Top stickers farmers:\n"
+        for i, item in enumerate(result):
+            reply_message += f"[{i + 1}] {item[1].strip()} ({item[0]}) : {item[2]} stickers.\n"
+        bot.reply_to(message, reply_message)
 
-        bot.reply_to(message.chat.id, f"{username}:  {result}")
+@bot.message_handler(commands=["add"])
+def get_adds(message):
+    add_session[message.from_user] = []
+    bot.send_message(message.chat.id, "Введите: НИК Число")
 
-    elif (message.text == "Добавить стикеры"):
-        markup1 = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        back = types.KeyboardButton("Главное меню")
-        markup1.add(back)
-        bot.send_message(message.chat.id, "Введите ник ученика")
+@bot.message_handler(commands=["minus"])
+def get_minus(message):
+    minus_session[message.from_user] = []
+    bot.send_message(message.chat.id, "Введите: НИК Число")
 
-        @bot.message_handler(content_types=['text'])
-        def get_text_messages4(message2):
-            user_nick = message2.text
-            db_object.execute(f"SELECT nick FROM users WHERE nick = {user_nick}")
-            result1 = db_object.fetchone()
-            if not result1:
-                bot.send_message(message2.chat.id, 'Такого ученика нет')
-            else:
-                bot.send_message(message2.chat.id, "Введите количество стикеров")
+def smena(nick, id):
+    user_id = id
+    db_object.execute(f"UPDATE users SET nick = {nick} WHERE id = {user_id}")
+    db_connection.commit()
 
-                @bot.message_handler(content_types=['text'])
-                def get_text_messages3(message3):
-                    bal = message3.text
-                    addstic(usernick=result1, stickers=bal)
-
-    elif (message.text == "Отнять стикеры"):
-        @bot.message_handler(content_types=['text'])
-        def get_text_messages4(message4):
-            user_nick = message4.text
-            db_object.execute(f"SELECT nick FROM users WHERE nick = {user_nick}")
-            result1 = db_object.fetchone()
-            if not result1:
-                bot.send_message(message4.chat.id, 'Такого ученика нет')
-            else:
-                bot.send_message(message4.chat.id, "Введите количество стикеров")
-
-                @bot.message_handler(content_types=['text'])
-                def get_text_messages5(message5):
-                    bal = message5.text
-                    minusstic(usernick=result1, stickers=bal)
-
-    elif (message.text == "Главное меню"):
-        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        btn1 = types.KeyboardButton("Профиль")
-        btn2 = types.KeyboardButton("Сменить ник")
-        btn3 = types.KeyboardButton("Добавить стикеры")
-        btn4 = types.KeyboardButton("Отнять стикеры")
-        btn5 = types.KeyboardButton("Все данные")
-        markup.add(btn1, btn2, btn3, btn4, btn5)
-
-    elif (message.text == "Все данные"):
-        user_id = message.from_user.id
-        if user_id == 956153880 or user_id == 581490657:
-            bot.send_message(message.chat.id, 'Список:')
-            db_object.execute("SELECT username, stickers FROM users")
-            result = db_object.fetchall()
-            for i in result:
-                bot.send_message(message.chat.id, f"{i[0], i[1]}")
-        else:
-            bot.send_message(message.chat.id, 'У вас недостаточно прав')
-
-    elif (message.text == "Сменить ник"):
-        bot.send_message(message.chat.id, "Введите новый ник")
-
-        @bot.message_handler(content_types=['text'])
-        def get_text_messages2(message2):
-            user_id2 = message2.from_user.id
-            db_object.execute(f"UPDATE users SET nick = {message2.text} WHERE id = {user_id2}")
-            db_connection.commit()
-            bot.send_message(message.chat.id, "Ник успешно сменен")
+@bot.message_handler(content_types=["text"])
+def message_from_user(message):
+    if 'изменить ник' in message.text:
+        id = message.from_user.id
+        new = message.text[13:]
+        smena(new, id)
 
 
 @server.route(f"/{BOT_TOKEN}", methods=["POST"])
