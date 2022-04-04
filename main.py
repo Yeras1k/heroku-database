@@ -14,13 +14,13 @@ db_connection = psycopg2.connect(DB_URI, sslmode="require")
 db_object = db_connection.cursor()
 
 
-def zhdat(user_id, stickers):
-    db_object.execute(f"UPDATE users SET stickers = stickers + {int(stickers)} WHERE id = {user_id}")
+def addstic(usernick, stickers):
+    db_object.execute(f"UPDATE users SET stickers = stickers + {int(stickers)} WHERE nick = {usernick}")
     db_connection.commit()
 
 
-def nezhdat(user_id, stickers):
-    db_object.execute(f"UPDATE users SET stickers = stickers - {int(stickers)} WHERE id = {user_id}")
+def minusstic(usernick, stickers):
+    db_object.execute(f"UPDATE users SET stickers = stickers - {int(stickers)} WHERE nick = {usernick}")
     db_connection.commit()
 
 
@@ -31,7 +31,7 @@ def show(message):
     db_object.execute(f"SELECT stickers FROM users WHERE id = {user_id}")
     result = db_object.fetchone()
 
-    bot.reply_to(message, f"{username}:  {result}")
+    bot.reply_to(message, f"{username}:  {result[:-1]}")
 
 
 @bot.message_handler(commands=["start"])
@@ -50,20 +50,51 @@ def start(message):
 
 @bot.message_handler(content_types=['text'])
 def get_text_messages(message):
-    if "добавить" in message.text.lower():
-        user_id = message.from_user.id
-        stic = message.text[9:]
-        zhdat(user_id=user_id, stickers=stic)
-    if 'снизить' in message.text.lower():
-        user_id = message.from_user.id
-        stic = message.text[8:]
-        nezhdat(user_id=user_id, stickers=stic)
+    if message.text == '+':
+        bot.send_message(message.chat.id, 'Введите имя ученика')
+
+        @bot.message_handler(content_types=['text'])
+        def get_text_messages2(message2):
+            user_nick = message2.text
+            db_object.execute(f"SELECT nick FROM users WHERE nick = {user_nick}")
+            result1 = db_object.fetchone()
+            if not result1:
+                bot.send_message(message2.chat.id, 'Такого ученика нет')
+            else:
+                bot.send_message(message2.chat.id, 'Введите имя ученика')
+
+                @bot.message_handler(content_types=['text'])
+                def get_text_messages3(message3):
+                    addstic(usernick=user_nick, stickers=message3.text)
+
+    if message.text == '-':
+        bot.send_message(message.chat.id, 'Введите имя ученика')
+
+        @bot.message_handler(content_types=['text'])
+        def get_text_messages2(message2):
+            user_nick = message2.text
+            db_object.execute(f"SELECT nick FROM users WHERE nick = {user_nick}")
+            result2 = db_object.fetchone()
+            if not result2:
+                bot.send_message(message2.chat.id, 'Такого ученика нет')
+            else:
+                bot.send_message(message2.chat.id, 'Введите имя ученика')
+
+                @bot.message_handler(content_types=['text'])
+                def get_text_messages3(message3):
+                    minusstic(usernick=user_nick, stickers=message3.text)
+
     if message.text.lower() == 'all':
-        bot.send_message(message.chat.id, 'ВОТ')
-        db_object.execute("SELECT username, stickers FROM users")
-        result = db_object.fetchall()
-        for i in result:
-            bot.send_message(message.chat.id, f"{i[0], i[1]}")
+        user_id = message.from_user.id
+        if user_id == "956153880" or user_id == "581490657":
+            bot.send_message(message.chat.id, 'Список:')
+            db_object.execute("SELECT username, stickers FROM users")
+            result = db_object.fetchall()
+            for i in result:
+                bot.send_message(message.chat.id, f"{i[0] + i[1]}")
+        else:
+            bot.send_message(message.chat.id, 'У вас недостаточно прав')
+
 
 @server.route(f"/{BOT_TOKEN}", methods=["POST"])
 def redirect_message():
@@ -71,6 +102,7 @@ def redirect_message():
     update = telebot.types.Update.de_json(json_string)
     bot.process_new_updates([update])
     return "!", 200
+
 
 if __name__ == "__main__":
     bot.remove_webhook()
