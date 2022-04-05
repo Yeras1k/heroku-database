@@ -7,7 +7,6 @@ import logging
 from config import *
 from flask import Flask, request
 
-add_session = {}
 
 bot = telebot.TeleBot(BOT_TOKEN)
 server = Flask(__name__)
@@ -21,11 +20,12 @@ db_object = db_connection.cursor()
 @bot.message_handler(commands=["start"])
 def start(message):
     bot.send_message(message.chat.id, "Все команды: \n"
-                                       "1. /stats - просмотр своего количества стикеров \n"
-                                       "2. изменить ник ... - вместо ... пишите свой новый ник \n"
-                                       "3. /statsall - просмотр всех учеников(только для учителя) \n"
-                                       "4. edit ХХХ ... - изменение кол. стикеров ученика(+ и -)(только для учителя)")
-    usernick = message.from_user.first_name
+                                      "1. /stats - просмотр своего количества стикеров \n"
+                                      "2. изменить ник ... - вместо ... пишите свой новый ник \n"
+                                      "3. стикеры ... - вместо ... напишите число(+добавить; -отнять) \n"
+                                      "3. /statsall - просмотр всех учеников(только для учителя) \n"
+                                      "4. edit ХХХ ... - изменение кол. стикеров ученика(+ и -)(только для учителя)\n"
+                                      "5. /off - отключение для учеников 'стикеры ...'(только для учителя) ")
     user_id = message.from_user.id
     username = message.from_user.username
     bot.reply_to(message, f"Hello, {message.from_user.first_name}!")
@@ -34,8 +34,8 @@ def start(message):
     result = db_object.fetchone()
 
     if not result:
-        db_object.execute("INSERT INTO users(id, username, stickers, nick) VALUES (%s, %s, %i, %s)",
-                          (user_id, username, 0, usernick))
+        db_object.execute(f"INSERT INTO users(id, username, stickers, nick) VALUES ('{user_id}', '{username}', "
+                          f"0, '{username}')")
         db_connection.commit()
 
 
@@ -60,6 +60,7 @@ def get_stats(message):
     user_id = message.from_user.id
     db_object.execute(f"SELECT * FROM users WHERE id = {user_id}")
     result = db_object.fetchall()
+
     if not result:
         bot.reply_to(message, "No data...")
     else:
@@ -78,7 +79,19 @@ def message_from_user(message):
         db_connection.commit()
         bot.send_message(message.chat.id, "Ник УСПЕШНО изменен")
 
+    if 'стикеры ' in message.text:
+        stickers = message.text[8:]
+        userid = message.from_user.id
+        user_nick = message.from_user.username
+        db_object.execute(f"UPDATE users SET stickers = stickers + {int(stickers)} WHERE id = {userid}")
+        db_object.execute(f"SELECT stickers FROM users WHERE id = {userid}")
+        c = db_object.fetchone()
+        db_connection.commit()
+        bot.send_message(message.chat.id,
+                         f"Твоё({user_nick}) количество стикеров изменены на [{stickers}] и сейчас составляют [{c[0]}]")
+
     if 'edit' in message.text:
+        userid = message.from_user.id
         new = message.text[5:]
         a = new.split()
         user_nick = a[0]
@@ -88,12 +101,16 @@ def message_from_user(message):
         if not result1:
             bot.send_message(message.chat.id, 'Такого ученика нет, попробуйте снова')
         else:
-            db_object.execute(f"UPDATE users SET stickers = stickers + {int(stickers)} WHERE nick = '{user_nick}'")
-            db_object.execute(f"SELECT stickers FROM users WHERE nick = '{user_nick}'")
-            c = db_object.fetchone()
-            db_connection.commit()
-            bot.send_message(message.chat.id,
-                             f"Количество стикеров для ({user_nick}) изменены на [{stickers}] и составляют [{c[0]}]")
+            if userid == 581490657 or userid == 956153880:
+                db_object.execute(f"UPDATE users SET stickers = stickers + {int(stickers)} WHERE nick = '{user_nick}'")
+                db_object.execute(f"SELECT stickers FROM users WHERE nick = '{user_nick}'")
+                c = db_object.fetchone()
+                db_connection.commit()
+                bot.send_message(message.chat.id,
+                                 f"Количество стикеров для ({user_nick}) изменены "
+                                 f"на [{stickers}] и составляют [{c[0]}]")
+            else:
+                bot.send_message(message.chat.id, "Недостаточно прав")
 
 
 @server.route(f"/{BOT_TOKEN}", methods=["POST"])
