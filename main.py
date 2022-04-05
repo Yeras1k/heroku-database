@@ -47,7 +47,7 @@ def get_stats(message):
         else:
             reply_message = "- Top stickers farmers:\n"
             for i, item in enumerate(result):
-                reply_message += f"[{i + 1}] {item[3].strip()} ({item[1].strip()}) : {item[2]} stickers.\n"
+                reply_message += f"[{i + 1}] {item[3].strip()} ({item[0].strip()}) : {item[2]} stickers.\n"
             bot.reply_to(message, reply_message)
     else:
         bot.send_message(message.chat.id, "Недостаточно прав")
@@ -79,6 +79,7 @@ def message_from_user(message):
 
     if 'edit' in message.text:
         username = message.from_user.username
+        userid = message.from_user.id
         new = message.text[5:]
         a = new.split()
         user_nick = a[0]
@@ -88,7 +89,7 @@ def message_from_user(message):
         if not result1:
             bot.send_message(message.chat.id, 'Такого ученика нет, попробуйте снова')
         else:
-            if username == 'yeras1k' or username == 'b4kyt":
+            if userid == userid:
                 db_object.execute(f"UPDATE users SET stickers = stickers + {int(stickers)} WHERE nick = '{user_nick}'")
                 db_object.execute(f"SELECT stickers FROM users WHERE nick = '{user_nick}'")
                 c = db_object.fetchone()
