@@ -34,8 +34,7 @@ def start(message):
     result = db_object.fetchone()
 
     if not result:
-        db_object.execute("INSERT INTO users(id, username, stickers) VALUES (%s, %s, %i)",
-                          (user_id, username, 0))
+        db_object.execute("INSERT INTO users(id, name, stickers) VALUES (%s, %s, %i)", (user_id, username, 0))
         db_connection.commit()
 
 
