@@ -78,6 +78,7 @@ def message_from_user(message):
         bot.send_message(message.chat.id, "Ник УСПЕШНО изменен")
 
     if 'edit' in message.text:
+        username = message.from_user.username
         new = message.text[5:]
         a = new.split()
         user_nick = a[0]
@@ -87,12 +88,14 @@ def message_from_user(message):
         if not result1:
             bot.send_message(message.chat.id, 'Такого ученика нет, попробуйте снова')
         else:
-            db_object.execute(f"UPDATE users SET stickers = stickers + {int(stickers)} WHERE nick = '{user_nick}'")
-            db_object.execute(f"SELECT stickers FROM users WHERE nick = '{user_nick}'")
-            c = db_object.fetchone()
-            db_connection.commit()
-            bot.send_message(message.chat.id,
-                             f"Количество стикеров для ({user_nick}) изменены на [{stickers}] и составляют [{c[0]}]")
+            if username == 'yeras1k' or username == 'b4kyt":
+                db_object.execute(f"UPDATE users SET stickers = stickers + {int(stickers)} WHERE nick = '{user_nick}'")
+                db_object.execute(f"SELECT stickers FROM users WHERE nick = '{user_nick}'")
+                c = db_object.fetchone()
+                db_connection.commit()
+                bot.send_message(message.chat.id,
+                                 f"Количество стикеров для ({user_nick}) изменены на [{stickers}] и составляют [{c[0]}]")
+            else:
 
 
 @server.route(f"/{BOT_TOKEN}", methods=["POST"])
