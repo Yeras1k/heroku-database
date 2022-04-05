@@ -89,7 +89,7 @@ def message_from_user(message):
         if not result1:
             bot.send_message(message.chat.id, 'Такого ученика нет, попробуйте снова')
         else:
-            if userid == userid:
+            if userid == 581490657 or userid == 956153880:
                 db_object.execute(f"UPDATE users SET stickers = stickers + {int(stickers)} WHERE nick = '{user_nick}'")
                 db_object.execute(f"SELECT stickers FROM users WHERE nick = '{user_nick}'")
                 c = db_object.fetchone()
@@ -97,6 +97,7 @@ def message_from_user(message):
                 bot.send_message(message.chat.id,
                                  f"Количество стикеров для ({user_nick}) изменены на [{stickers}] и составляют [{c[0]}]")
             else:
+                bot.send_message(message.chat.id, "Недостаточно прав")
 
 
 @server.route(f"/{BOT_TOKEN}", methods=["POST"])
