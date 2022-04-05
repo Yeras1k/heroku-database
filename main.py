@@ -7,7 +7,6 @@ import logging
 from config import *
 from flask import Flask, request
 
-add_session = {}
 
 bot = telebot.TeleBot(BOT_TOKEN)
 server = Flask(__name__)
