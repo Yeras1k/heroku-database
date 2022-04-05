@@ -47,7 +47,7 @@ def get_stats(message):
         else:
             reply_message = "- Top stickers farmers:\n"
             for i, item in enumerate(result):
-                reply_message += f"[{i + 1}] {item[3].strip()} ({item[0].strip()}) : {item[2]} stickers.\n"
+                reply_message += f"[{i + 1}] {item[3].strip()} ({item[1].strip()}) : {item[2]} stickers.\n"
             bot.reply_to(message, reply_message)
     else:
         bot.send_message(message.chat.id, "Недостаточно прав")
