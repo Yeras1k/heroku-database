@@ -124,7 +124,6 @@ def redirect_message():
     bot.process_new_updates([update])
     return "!", 200
 
-
 if __name__ == "main":
     bot.remove_webhook()
     bot.set_webhook(url=APP_URL)
