@@ -6,11 +6,12 @@ import logging
 from config import *
 from flask import Flask, request
 
+bot1 = Bot(token=BOT_TOKEN)
 bot = telebot.TeleBot(BOT_TOKEN)
 server = Flask(__name__)
 logger = telebot.logger
 logger.setLevel(logging.DEBUG)
-dp = Dispatcher(bot)
+dp = Dispatcher(bot1)
 
 db_connection = psycopg2.connect(DB_URI, sslmode="require")
 db_object = db_connection.cursor()
