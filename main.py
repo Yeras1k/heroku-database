@@ -22,7 +22,7 @@ def start(message):
     user_id = message.from_user.id
     username = message.from_user.username
     bot.reply_to(message, f"Hello, {message.from_user.first_name}!")
-    bot.reply_to(message, f"Введите или нажмите на /help чтоб просмотреть все команды бота")
+    bot.send_message(message.chat.id, f"Введите или нажмите на /help чтоб просмотреть все команды бота")
     db_object.execute(f"SELECT id FROM users WHERE id = {user_id}")
     result = db_object.fetchone()
 
