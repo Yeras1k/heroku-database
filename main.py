@@ -1,6 +1,6 @@
 import os
 import telebot
-from aiogram import *
+from aiogram import Bot, Dispatcher, executor, types
 import psycopg2
 import logging
 from config import *
@@ -10,9 +10,18 @@ bot = telebot.TeleBot(BOT_TOKEN)
 server = Flask(__name__)
 logger = telebot.logger
 logger.setLevel(logging.DEBUG)
+dp = Dispatcher(bot)
 
 db_connection = psycopg2.connect(DB_URI, sslmode="require")
 db_object = db_connection.cursor()
+
+
+@dp.message_handler(commands="poka")
+async def cmd_start(message: types.Message):
+    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    buttons = ["Профиль", "Сменить ник"]
+    keyboard.add(*buttons)
+    await message.answer("Привет", reply_markup=keyboard)
 
 
 @bot.message_handler(commands=["start"])
