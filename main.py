@@ -7,7 +7,6 @@ import logging
 from config import *
 from flask import Flask, request
 
-
 bot = telebot.TeleBot(BOT_TOKEN)
 server = Flask(__name__)
 logger = telebot.logger
@@ -19,6 +18,10 @@ db_object = db_connection.cursor()
 
 @bot.message_handler(commands=["start"])
 def start(message):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    btn1 = types.KeyboardButton("Профиль")
+    btn2 = types.KeyboardButton("Смена ника")
+    markup.add(btn1, btn2)
     user_id = message.from_user.id
     username = message.from_user.username
     bot.reply_to(message, f"Hello, {message.from_user.first_name}!")
@@ -41,6 +44,7 @@ def help1(message):
                                       "3. /statsall - просмотр всех учеников(только для учителя) \n"
                                       "4. edit ХХХ ... - изменение кол. стикеров ученика(+ и -)(только для учителя)\n"
                                       "5. /off - отключение для учеников 'стикеры ...'(только для учителя) ")
+
 
 @bot.message_handler(commands=["statsall"])
 def get_stats(message):
