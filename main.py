@@ -6,6 +6,9 @@ import psycopg2
 import logging
 from config import *
 from flask import Flask, request
+from aiogram.types import ReplyKeyboardRemove, \
+    ReplyKeyboardMarkup, KeyboardButton, \
+    InlineKeyboardMarkup, InlineKeyboardButton
 
 bot = telebot.TeleBot(BOT_TOKEN)
 server = Flask(__name__)
@@ -18,10 +21,10 @@ db_object = db_connection.cursor()
 
 @bot.message_handler(commands=["start"])
 def start(message):
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    btn1 = types.KeyboardButton("Профиль")
-    btn2 = types.KeyboardButton("Смена ника")
-    markup.add(btn1, btn2)
+    button_hi = KeyboardButton('Профиль')
+    greet_kb = ReplyKeyboardMarkup()
+    greet_kb.add(button_hi)
+
     user_id = message.from_user.id
     username = message.from_user.username
     bot.reply_to(message, f"Hello, {message.from_user.first_name}!")
