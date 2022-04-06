@@ -17,12 +17,13 @@ db_connection = psycopg2.connect(DB_URI, sslmode="require")
 db_object = db_connection.cursor()
 
 
-@dp.message_handler(commands="poka")
+@dp.message_handler(commands=["poka"])
 async def cmd_start(message: types.Message):
-    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    buttons = ["Профиль", "Сменить ник"]
-    keyboard.add(*buttons)
-    await message.answer("Привет", reply_markup=keyboard)
+    poll_keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    poll_keyboard.add(types.KeyboardButton(text="Профиль"))
+    poll_keyboard.add(types.KeyboardButton(text="Смена никак"))
+
+    await message.answer("Yf;vbnt", reply_markup=poll_keyboard)
 
 
 @bot.message_handler(commands=["start"])
