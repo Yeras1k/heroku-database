@@ -6,9 +6,7 @@ import psycopg2
 import logging
 from config import *
 from flask import Flask, request
-from aiogram.types import ReplyKeyboardRemove, \
-    ReplyKeyboardMarkup, KeyboardButton, \
-    InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram import types
 
 bot = telebot.TeleBot(BOT_TOKEN)
 server = Flask(__name__)
@@ -21,9 +19,6 @@ db_object = db_connection.cursor()
 
 @bot.message_handler(commands=["start"])
 def start(message):
-    button_hi = KeyboardButton('Профиль')
-    greet_kb = ReplyKeyboardMarkup()
-    greet_kb.add(button_hi)
 
     user_id = message.from_user.id
     username = message.from_user.username
@@ -36,6 +31,16 @@ def start(message):
         db_object.execute(f"INSERT INTO users(id, username, stickers, nick) VALUES ('{user_id}', '{username}', "
                           f"0, '{username}')")
         db_connection.commit()
+
+
+@dp.message_handler(commands="poka")
+async def cmd_start(message: types.Message):
+    keyboard = types.ReplyKeyboardMarkup()
+    button_1 = types.KeyboardButton(text="С пюрешкой")
+    keyboard.add(button_1)
+    button_2 = "Без пюрешки"
+    keyboard.add(button_2)
+    await message.answer("Как подавать котлеты?", reply_markup=keyboard)
 
 
 @bot.message_handler(commands=["help"])
