@@ -1,29 +1,18 @@
 import os
 import telebot
-from aiogram import Bot, Dispatcher, executor, types
 import psycopg2
 import logging
 from config import *
 from flask import Flask, request
 
-bot1 = Bot(token=BOT_TOKEN)
+
 bot = telebot.TeleBot(BOT_TOKEN)
 server = Flask(__name__)
 logger = telebot.logger
 logger.setLevel(logging.DEBUG)
-dp = Dispatcher(bot1)
 
 db_connection = psycopg2.connect(DB_URI, sslmode="require")
 db_object = db_connection.cursor()
-
-
-@dp.message_handler(commands=["poka"])
-async def cmd_start(message: types.Message):
-    poll_keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    poll_keyboard.add(types.KeyboardButton(text="Профиль"))
-    poll_keyboard.add(types.KeyboardButton(text="Смена никак"))
-
-    await message.answer("Yf;vbnt", reply_markup=poll_keyboard)
 
 
 @bot.message_handler(commands=["start"])
