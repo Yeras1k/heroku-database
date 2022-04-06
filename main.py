@@ -42,7 +42,6 @@ def help1(message):
                                       "4. edit ХХХ ... - изменение кол. стикеров ученика(+ и -)(только для учителя)\n"
                                       "5. /off - отключение для учеников 'стикеры ...'(только для учителя) ")
 
-
 @bot.message_handler(commands=["statsall"])
 def get_stats(message):
     db_object.execute("SELECT * FROM users ORDER BY stickers DESC LIMIT 20")
