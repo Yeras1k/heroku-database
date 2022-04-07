@@ -35,8 +35,8 @@ def start(message):
 def help1(message):
     bot.send_message(message.chat.id, "Все команды: \n"
                                       "1. /stats - просмотр своего количества стикеров \n"
-                                      "2. изменить ник ... - вместо ... пишите свой новый ник \n"
-                                      "3. стикеры ... - вместо ... напишите число(+добавить; -отнять) \n"
+                                      "2. newnick ... - вместо ... пишите свой новый ник \n"
+                                      "3. stic ... - вместо ... напишите число(+добавить; -отнять) \n"
                                       "3. /statsall - просмотр всех учеников(только для учителя) \n"
                                       "4. edit ХХХ ... - изменение кол. стикеров ученика(+ и -)(только для учителя)\n"
                                       "5. /off - отключение для учеников 'стикеры ...'(только для учителя) ")
@@ -75,15 +75,15 @@ def get_stats(message):
 
 @bot.message_handler(content_types=["text"])
 def message_from_user(message):
-    if 'изменить ник' in message.text:
+    if 'newnick' in message.text:
         userid = message.from_user.id
-        new = message.text[13:]
+        new = message.text[8:]
         db_object.execute(f"UPDATE users SET nick = '{new}' WHERE id = {userid}")
         db_connection.commit()
         bot.send_message(message.chat.id, "Ник УСПЕШНО изменен")
 
-    if 'стикеры' in message.text:
-        stickers = message.text[8:]
+    if 'stic' in message.text:
+        stickers = message.text[5:]
         userid = message.from_user.id
         user_nick = message.from_user.username
         db_object.execute(f"UPDATE users SET stickers = stickers + {int(stickers)} WHERE id = {userid}")
