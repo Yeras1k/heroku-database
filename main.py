@@ -1,9 +1,10 @@
 import os
 import telebot
-import psycopg2
 import logging
+import psycopg2
 from config import *
 from flask import Flask, request
+
 
 
 
