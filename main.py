@@ -25,7 +25,6 @@ def start(message):
     bot.send_message(message.chat.id, f"Введите или нажмите на /help чтоб просмотреть все команды бота")
     db_object.execute(f"SELECT id FROM users WHERE id = {user_id}")
     result = db_object.fetchone()
-
     if not result:
         db_object.execute(f"INSERT INTO users(id, username, stickers, nick) VALUES ('{user_id}', '{username}', "
                           f"0, '{username}')")
