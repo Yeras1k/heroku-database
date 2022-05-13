@@ -94,6 +94,10 @@ def message_from_user(message):
         bot.send_message(message.chat.id,
                          f"Твоё({user_nick}) количество стикеров изменено на [{stickers}] и сейчас составляют [{c[0]}]")
 
+    if 'data' in message.text:
+        userid = message.from_user.id
+        bot.send_message(message.chat.id, f'{chat.id}')
+        
     if 'edit' in message.text:
         userid = message.from_user.id
         new = message.text[5:]
